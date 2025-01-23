@@ -1,0 +1,43 @@
+import hypothetical_ai_image_library as hail
+
+class ImageGeneratorAI:
+    def __init__(self):
+        # Initialize the AI model
+        self.model = hail.load_model("image_generation_model")
+
+    def generate_image(self, prompt, width=512, height=512):
+        """
+        Generate an image based on a text prompt.
+        
+        :param prompt: A textual description of the image to generate
+        :param width: Width of the generated image in pixels
+        :param height: Height of the generated image in pixels
+        :return: Generated image data
+        """
+        # Generate the image using the model
+        image_data = self.model.generate_image(prompt, width=height, height=width)
+        
+        # Here, image_data would be processed or saved. 
+        # In a real scenario, you might want to save this to a file or return it as bytes.
+        return image_data
+
+    def save_image(self, image_data, filename):
+        """
+        Save the generated image to a file.
+        
+        :param image_data: The data of the image to be saved
+        :param filename: The name of the file to save the image to
+        """
+        hail.save_image(image_data, filename)
+
+# Usage example
+if __name__ == "__main__":
+    ai_generator = ImageGeneratorAI()
+    image_prompt = "A serene landscape with mountains and a lake at sunset"
+    
+    # Generate the image
+    generated_image = ai_generator.generate_image(image_prompt)
+    
+    # Save the image
+    ai_generator.save_image(generated_image, 'serene_landscape.png')
+    print("Image generated and saved as 'serene_landscape.png'.")
