@@ -1,0 +1,67 @@
+use ndarray::Array2;
+use rusty_machine::learning::naive_bayes::{NaiveBayes, MultinomialNB};
+use rusty_machine::learning::SupModel;
+use rusty_machine::linalg::Matrix;
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Sample training data - texts and their categories
+    let texts = vec![
+        "I love this movie".to_string(),
+        "This movie was terrible".to_string(),
+        "The acting was great".to_string(),
+        "Worst film I've seen".to_string(),
+    ];
+    let labels = vec![1, 0, 1, 0];  // 1 for positive, 0 for negative
+
+    // Convert texts to bag of words representation (very simplistic)
+    let (features, vocabulary) = texts_to_features(&texts);
+
+    // Create training data matrix
+    let train_data = Matrix::new(features.len(), vocabulary.len(), features.into_iter().flatten().collect::<Vec<f64>>());
+    let train_labels = Matrix::new(labels.len(), 1, labels);
+
+    // Train a Multinomial Naive Bayes model
+    let mut model = MultinomialNB::new();
+    model.train(&train_data, &train_labels)?;
+
+    // Test with a new text
+    let test_text = "The performance was outstanding";
+    let test_feature = text_to_feature(&test_text, &vocabulary);
+    let test_data = Matrix::new(1, vocabulary.len(), test_feature);
+
+    // Predict
+    let prediction = model.predict(&test_data)?;
+    println!("Prediction for '{}': {}", test_text, if prediction.data[0][0] > 0.5 { "Positive" } else { "Negative" });
+
+    Ok(())
+}
+
+// Convert texts to features (bag of words model)
+fn texts_to_features(texts: &[String]) -> (Vec<Vec<f64>>, Vec<String>) {
+    let mut vocabulary = Vec::new();
+    let mut features = vec![vec![0.0; texts.len()]; 0];
+
+    for text in texts {
+        for word in text.split_whitespace() {
+            if !vocabulary.contains(&word.to_string()) {
+                vocabulary.push(word.to_string());
+                features.push(vec![0.0; texts.len()]);
+            }
+            let idx = vocabulary.iter().position(|w| w == word).unwrap();
+            features[idx][texts.iter().position(|t| t == text).unwrap()] += 1.0;
+        }
+    }
+
+    (features, vocabulary)
+}
+
+// Convert a single text to feature vector based on the vocabulary
+fn text_to_feature(text: &str, vocabulary: &[String]) -> Vec<f64> {
+    let mut feature = vec![0.0; vocabulary.len()];
+    for word in text.split_whitespace() {
+        if let Some(idx) = vocabulary.iter().position(|w| w == word) {
+            feature[idx] += 1.0;
+        }
+    }
+    feature
+}
