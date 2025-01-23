@@ -1,0 +1,43 @@
+import random
+
+class ChromeAI:
+    def __init__(self, name="Chrome"):
+        self.name = name
+        self.greetings = ["Hello!", "Hi there!", "Greetings!", "Hey!"]
+        self.farewells = ["Goodbye!", "See you later!", "Farewell!", "Take care!"]
+    
+    def greet(self):
+        return random.choice(self.greetings)
+    
+    def farewell(self):
+        return random.choice(self.farewells)
+    
+    def respond(self, user_input):
+        if user_input.lower() in ['hi', 'hello', 'hey']:
+            return self.greet()
+        elif user_input.lower() in ['bye', 'goodbye', 'see you']:
+            return self.farewell()
+        elif "name" in user_input.lower():
+            return f"My name is {self.name}."
+        elif "time" in user_input.lower():
+            return "I don't have a watch, but I'm sure it's time for adventure!"
+        elif "joke" in user_input.lower():
+            return "Why was the computer cold? Because it left its Windows open!"
+        elif "help" in user_input.lower():
+            return "I can help with greetings, farewells, telling you my name, or sharing a bad computer pun. Anything else?"
+        else:
+            return "I'm not sure what you mean, but I'm here to help!"
+
+def main():
+    chrome = ChromeAI()
+    print(f"{chrome.greet()} I am {chrome.name}, your AI assistant.")
+    
+    while True:
+        user_input = input("You: ").strip()
+        if user_input.lower() == 'exit':
+            print(chrome.farewell())
+            break
+        print(f"{chrome.name}: {chrome.respond(user_input)}")
+
+if __name__ == "__main__":
+    main()
